@@ -1,0 +1,37 @@
+{
+  "configurations": [
+    {
+      "name": "x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${projectDir}\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+            "name": "OPENSPACE_MODULE_FIELDLINESSEQUENCE",
+            "value": "True",
+            "type": "BOOL"
+        },
+        {
+            "name": "OPENSPACE_MODULE_FLUXROPE",
+            "value": "True",
+            "type": "BOOL"
+        },
+        {
+          "name": "Boost_DIR",
+          "value": "C:/Boost/boost_1_81_0",
+          "type": "PATH"
+        },
+        {
+          "name": "Boost_INCLUDE_DIR",
+          "value": "C:/Boost/boost_1_81_0",
+          "type": "PATH"
+        }
+      ]
+    }
+  ]
+}

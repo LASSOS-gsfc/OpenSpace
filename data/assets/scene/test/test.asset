@@ -1,0 +1,91 @@
+local transforms = asset.require("scene/test/fieldline_transform")
+local earth_transforms = asset.require("scene/solarsystem/planets/earth/transforms")
+local magnetosphere_transforms = asset.require("scene/solarsystem/planets/earth/magnetosphere/transforms_magnetosphere")
+local propertyHelper = asset.require("util/property_helper")
+
+local psptransforms = asset.require("scene/psp/transforms")
+
+local directory = "C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\OpenSpace2\\OpenSpace\\data\\assets\\scene\\test\\testfieldline\\"
+
+local sunRadius = 6.957E8
+
+local au_to_m = 1.496e+11
+
+local keyframes = {
+
+    ['2023-03-30T12:00:00'] = {
+        Type = "StaticTranslation",
+        Position = {-au_to_m/5,0,0}
+    },
+    ['2023-03-30T13:00:00'] = {
+        Type = "StaticTranslation",
+        Position = {au_to_m/5,0,0}
+    },
+}
+
+
+
+local fieldlines = {
+    Identifier = "test",
+    Parent = psptransforms.PSP_RTN.Identifier,
+     Transform = {
+   
+  
+
+     Translation = {
+           Type = "TimelineTranslation",
+           ShouldInterpolate = true,
+           Keyframes = keyframes,   
+      },
+      Rotation = {
+            Type = "StaticRotation",
+            Rotation = {0,90,0}
+      }
+  },
+    Renderable = {
+        Type = "RenderableFluxRope",
+        LineWidth = 1.0,
+        SourceFolder = directory,
+        AlphaBlendlingEnabled = false,
+        InputFileType = "Json",
+        ScaleToMeters = au_to_m/100,
+    },
+
+     GUI = {
+        Name = "test",
+        Path = "/test",
+        Hidden = false
+    }
+  
+}
+
+local toggle_fieldlines = {
+  Identifier = "os.events.fieldlines.togglefieldlines",
+  Name = "Toggle Fieldlines",
+  Command = propertyHelper.invert("Scene.test.Renderable.Enabled"),
+  Documentation = "Toggle fieldline rendering of CME",
+  GuiPath = "/test",
+  IsLocal = false
+}
+
+
+asset.onInitialize(function ()
+  openspace.action.registerAction(toggle_fieldlines)
+  openspace.addSceneGraphNode(fieldlines)
+end)
+
+asset.onDeinitialize(function ()
+  openspace.removeSceneGraphNode(fieldlines)
+  openspace.action.removeAction(toggle_fieldlines)
+end)
+
+asset.export(fieldlines)
+
+asset.meta = {
+  Name = "Predictive Science Inc. Fieldlines Bastille Day",
+  Version = "1.1",
+  Description = "Magnetic fieldlines for the bastille day CME event",
+  Author = "CCMC, Jonathan Grangien, Matthias Berg",
+  URL = "https://dx.doi.org/10.3847/1538-4357/aab36d",
+  License = "CC-BY"
+}

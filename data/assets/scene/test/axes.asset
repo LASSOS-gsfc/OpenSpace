@@ -1,0 +1,33 @@
+local transforms = asset.require("scene/test/fieldline_transform")
+local psptransforms = asset.require("scene/psp/transforms")
+local magnetosphere_transforms = asset.require("scene/solarsystem/planets/earth/magnetosphere/transforms_magnetosphere")
+local debugHelper = asset.require("util/debug_helper")
+local au_to_m = 1.496e+11
+
+debugHelper.registerCartesianAxes(asset, {
+  Parent = transforms.GSEFrame.Identifier,
+  Scale = 0.1*au_to_m
+})
+
+debugHelper.registerCartesianAxes(asset, {
+    Parent = transforms.fieldlineReferenceFrame.Identifier,
+    Scale = 0.25*au_to_m
+})
+
+debugHelper.registerCartesianAxes(asset, {
+    Parent = magnetosphere_transforms.GSMReferenceFrame.Identifier,
+    Scale = 0.25*au_to_m
+})
+
+debugHelper.registerCartesianAxes(asset, {
+    Parent = psptransforms.PSP_RTN.Identifier,
+    Scale = 0.1*au_to_m
+})
+
+debugHelper.registerCartesianAxes(asset,{
+    Parent = psptransforms.PSPTransform.Identifier,
+    Scale = 0.1*au_to_m
+})
+
+
+

@@ -1,0 +1,123 @@
+local earth_transforms = asset.require("scene/solarsystem/planets/earth/transforms")
+local psp_transforms = asset.require("scene/psp/transforms")
+
+
+asset.require("spice/base")
+
+local GSMKernel = asset.localResource("./kernels/GSM.ti")
+local GSEKernel = asset.localResource("./kernels/GSE.ti")
+local PSPRTNKernel = asset.localResource("../psp/PSPRTN.ti")
+
+local au_to_m = 1.496e+11
+
+local keyframes = {
+
+    ['2023-03-30T12:00:00'] = {
+        Type = "StaticTranslation",
+        Position = {0,0,0}
+    },
+    ['2023-03-30T13:00:00'] = {
+        Type = "StaticTranslation",
+        Position = {0,0,0}
+    },
+}
+
+local GSMFrame = {
+  Identifier = "GSMFrame",
+  Parent = earth_transforms.EarthBarycenter.Identifier,
+  Transform = {
+    Rotation = {
+      Type = "SpiceRotation",
+      SourceFrame = "GSM", --Geocentric Solar Magnetospheric
+      DestinationFrame = "GALACTIC",
+      Kernels = GSMKernel
+    },
+   
+  },
+  GUI = {
+    Name = "GSM Reference Frame",
+    Path = "/test/GSM",
+    Hidden = true
+  }
+}
+
+local GSEFrame = {
+
+     Identifier = "GSEFrame",
+  Parent = earth_transforms.EarthBarycenter.Identifier,
+  Transform = {
+    Rotation = {
+      Type = "SpiceRotation",
+      SourceFrame = "GSE", --Geocentric Solar Magnetospheric
+      DestinationFrame = "GALACTIC",
+      Kernels = GSEKernel
+    },
+   
+  },
+  GUI = {
+    Name = "GSE Reference Frame",
+    Path = "/test/GSE",
+    Hidden = false
+  }
+}
+
+local GSERot = {
+    Identifier = "GSERot",
+    Parent = GSEFrame.Identifier,
+    Transform = {
+        Rotation = {
+            Type = "StaticRotation",
+            Rotation = {0,90,0}
+        }
+    },
+
+     GUI = {
+    Name = "Rotated GSE Reference Frame",
+    Path = "/test/GSERot",
+    Hidden = false
+  }
+}
+
+local fieldlineReferenceFrame = {
+    
+    Identifier = "fieldlineReferenceFrame",
+    Parent = earth_transforms.EarthIAU.Identifier,
+
+    Transform = {
+        Translation = {
+            Type = "TimelineTranslation",
+            ShouldInterpolate = true,
+            Keyframes = keyframes,   
+        }
+    },
+
+     GUI = {
+        Name = "Fieldline Reference Frame",
+        Path = "/test",
+        Hidden = false
+    }
+    
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(fieldlineReferenceFrame)
+  openspace.addSceneGraphNode(GSMFrame)
+  openspace.addSceneGraphNode(GSEFrame)
+  openspace.addSceneGraphNode(GSERot)
+end)
+
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(fieldlineReferenceFrame)
+  openspace.removeSceneGraphNode(GSMFrame)
+  openspace.removeSceneGraphNode(GSEFrame)
+  openspace.removeSceneGraphNode(GSERot)
+end)
+
+
+
+
+asset.export(fieldlineReferenceFrame)
+asset.export(GSMFrame)
+asset.export(GSEFrame)
+asset.export(GSERot)
