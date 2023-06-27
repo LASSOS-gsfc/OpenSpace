@@ -1,0 +1,62 @@
+local transforms = asset.require('scene/solarsystem/sun/transforms')
+local PSPRTNKernel = asset.localResource("PSPRTN.ti")
+
+local parkerSpiceID = -96
+ 
+local PSPTransform = {
+ 
+    Identifier = "PSPTransform",
+    Parent = transforms.SolarSystemBarycenter.Identifier,
+    Transform = {
+        Translation = {
+            Type = "SpiceTranslation",
+            Target = parkerSpiceID,
+            Observer = "SUN",
+            Kernels = {
+				asset.localResource("spice/spp_nom_20180812_20250831_v039_RO6.bsp")
+            },
+        },
+         Rotation = {
+      Type = "SpiceRotation",
+      SourceFrame = "J2000",
+      DestinationFrame = "SUN",
+    }
+    },
+}
+
+    local PSP_RTN = {
+
+        Identifier = "PSP_RTN",
+        Parent = PSPTransform.Identifier,
+
+        Transform = {
+             Rotation = {
+                  Type = "FixedRotation",
+                  Attached = "PSP_RTN",
+                  ZAxis = { 0, 0, 1 },
+                  ZAxisOrthogonal = true,
+                  XAxis = transforms.SunCenter.Identifier
+             }
+        },
+        GUI = {
+            Name = "PSP RTN Reference Frame",
+            Path = "/test/PSP",
+            Hidden = false
+          }
+    }
+
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(PSPTransform)
+  openspace.addSceneGraphNode(PSP_RTN)
+end)
+
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(PSPTransform)
+  openspace.removeSceneGraphNode(PSP_RTN)
+end)
+
+asset.export(PSPTransform)
+asset.export(PSP_RTN)
+

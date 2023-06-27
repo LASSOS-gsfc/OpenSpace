@@ -1,0 +1,81 @@
+local transforms = asset.require('scene/psp/transforms')
+local suntransforms = asset.require('scene/solarsystem/sun/transforms')
+
+local parkerSpiceID = -96
+
+local PSP = {
+    Identifier = "PSP",
+    Parent = transforms.PSP_RTN.Identifier,
+    Transform = {
+		Scale = {
+            Type = "StaticScale",
+            Scale = 1
+        },
+	
+    },
+    InteractionSphere = 0.1,
+    Renderable = {
+        Type = "RenderableModel",
+		Body = "PSP",
+		Enabled = true,
+		GeometryFile = asset.localResource("psp.glb"),
+		LightSources = {
+          {
+            Type = "SceneGraphLightSource",
+            Identifier = "Sun",
+            Node = suntransforms.SolarSystemBarycenter.Identifier,
+            Intensity = 1.0
+          }
+        }
+	},
+    GUI = {
+        Path = "/test/psp"
+    }
+}
+
+local PSPTrail = {
+    Identifier = "PSPTrail",
+    Parent = suntransforms.SolarSystemBarycenter.Identifier,
+    Renderable = {
+        Type = "RenderableTrailOrbit",
+        Translation = {
+            Type = "SpiceTranslation",
+            Target = parkerSpiceID,
+            Observer = "SUN"
+        },
+		Enabled = true,
+        Color = { 1.0, 0.6, 0.2},   
+      
+        Period = 365.242,
+        Resolution = 1000
+    },
+    GUI = {
+        Name = "PSP Trail",
+        Path = "/test/PSP Trail"
+    }
+}
+
+
+asset.onInitialize(function ()
+	openspace.addSceneGraphNode(PSP)
+	openspace.addSceneGraphNode(PSPTrail)
+end)
+
+asset.onDeinitialize(function ()
+	openspace.removeSceneGraphNode(PSP)
+	openspace.removeSceneGraphNode(PSPTrail)
+end)
+
+asset.export(PSP)
+asset.export(PSPTrail)
+
+
+asset.meta = {
+    Name = "PSP Space Telescope",
+    Version = "1.1",
+    Description = [[ Model and Trail for NASA. Model from Spitzer/CalTech, trail from
+    JPL Horizons]],
+    Author = "Dan Tell",
+    URL = "www.calacademy.org",
+    License = "CC-BY"
+}

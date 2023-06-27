@@ -22,6 +22,7 @@ Thumbs.db
 
 # OpenSpace-generated folders and files
 /bin/
+
 /cache/
 /cache-*/
 /cache_gdal/
@@ -42,3 +43,8 @@ COMMIT.md
 /modules/skybrowser/wwtimagedata
 doc
 config/schema/sgct.schema.json
+
+# local assets
+/out/
+/data/scene/psp/spice/
+/data/assets/scene/psp/spice

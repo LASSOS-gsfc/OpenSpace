@@ -1,0 +1,47 @@
+Geocentric Solar Equatorial (GSM) frame:
+Used by the BATSRUS model
+This Kernel's ID is not a valid ID!
+
+ +X is parallel to the geometric earth-sun position vector.
+
+ +Z axis is normalized component of north centered geomagnetic dipole
+ vector orthogonal to GSM +X axis.
+
+ +Y completes the right-handed frame.
+
+\begindata
+
+        FRAME_SPP_SPACECRAFT        = -96000
+        FRAME_-96000_NAME           = 'SPP_SPACECRAFT'
+        FRAME_-96000_CLASS          = 3
+        FRAME_-96000_CLASS_ID       = -96000   
+        FRAME_-96000_CENTER         = -96
+
+        CK_-96000_SCLK              = -96
+        CK_-96000_SPK               = -96
+
+
+\begintext
+
+PSP sun pointing frame
+
+\begindata
+
+        FRAME_RTN                     =  12345678
+        FRAME_12345678_NAME           = 'RTN'
+        FRAME_12345678_CLASS          =  5
+        FRAME_12345678_CLASS_ID       =  12345678
+        FRAME_12345678_CENTER         = -96
+        FRAME_12345678_RELATIVE       = 'J2000'
+        FRAME_12345678_DEF_STYLE      = 'PARAMETERIZED'
+        FRAME_12345678_FAMILY         = 'TWO-VECTOR'
+        FRAME_12345678_PRI_AXIS       = 'X'
+        FRAME_12345678_PRI_VECTOR_DEF = 'OBSERVER_TARGET_POSITION'
+        FRAME_12345678_PRI_OBSERVER   = 'SPP_SPACECRAFT'
+        FRAME_12345678_PRI_TARGET     = 'SUN'
+        FRAME_12345678_PRI_ABCORR     = 'NONE'
+        FRAME_12345678_SEC_AXIS       = 'Z'
+        FRAME_12345678_SEC_VECTOR_DEF = 'CONSTANT'
+        FRAME_12345678_SEC_FRAME      = 'ECLIPDATE'
+        FRAME_12345678_SEC_SPEC       = 'RECTANGULAR'
+        FRAME_12345678_SEC_VECTOR     = ( 0, 0, 1 )
