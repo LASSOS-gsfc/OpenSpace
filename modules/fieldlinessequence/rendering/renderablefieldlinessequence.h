@@ -59,6 +59,7 @@ protected:
     std::vector<std::string> _sourceFiles;
     std::unique_ptr<FieldlinesState> _newState;
     std::string _modelStr;
+    bool _loadingStatesDynamically = false;
     float _scalingFactor = 1.f;
 
     // note Elon: rework the case of only one state
@@ -111,7 +112,7 @@ private:
   
     // False => states are stored in RAM (using 'in-RAM-states'), True => states are
     // loaded from disk during runtime (using 'runtime-states')
-    bool _loadingStatesDynamically  = false;
+
     // Used for 'runtime-states'. True when finished loading a new state from disk on
     // another thread.
     // True when new state is loaded or user change which quantity to color the lines by
