@@ -11,6 +11,8 @@ namespace openspace {
 
         FluxRopeModule();
 
+        std::vector<documentation::Documentation> documentations() const override;
+
     protected:
         void internalInitialize(const ghoul::Dictionary&) override;
     };

@@ -65,6 +65,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 if (MSVC)
   # Force all builds to be multi-threaded and increase number of sections in obj files
+  # add_definitions
   add_compile_options(/MP /bigobj)
 endif ()
 

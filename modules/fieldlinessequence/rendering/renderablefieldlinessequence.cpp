@@ -1136,7 +1136,7 @@ void RenderableFieldlinesSequence::update(const UpdateData& data) {
         if (_loadingStatesDynamically) {
             _states[0] = std::move(*_newState);
         }
-
+        LWARNING(fmt::format("Updating vertices {}",_activeStateIndex));
         updateVertexPositionBuffer();
 
         if (_states[_activeStateIndex].nExtraQuantities() > 0) {
