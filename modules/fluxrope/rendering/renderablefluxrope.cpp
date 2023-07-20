@@ -78,6 +78,7 @@ namespace openspace {
 
     void RenderableFluxRope::definePropertyCallbackFunctions() {
         _loadNewPointsBtn.onChange([this]() {
+            _loadingStatesDynamically = true; 
             LWARNING(fmt::format("Failed to load state from: {}", _fluxRopeFilePath.value()));
             if (!_fluxRopeFilePath.value().empty()) loadNewJsonStateIntoRAM();
             });
