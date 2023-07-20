@@ -5,6 +5,7 @@
 #include <openspace/util/factorymanager.h>
 #include <ghoul/misc/assert.h>
 #include <ghoul/misc/templatefactory.h>
+#include <openspace/documentation/documentation.h>
 
 namespace openspace {
 
@@ -16,6 +17,13 @@ namespace openspace {
         ghoul_assert(fRenderable, "No renderable factory existed");
 
         fRenderable->registerClass<RenderableFluxRope>("RenderableFluxRope");
+    }
+
+    std::vector<documentation::Documentation> FluxRopeModule::documentations() const
+    {
+        return {
+            RenderableFluxRope::Documentation()
+        };
     }
 
 } // namespace openspace

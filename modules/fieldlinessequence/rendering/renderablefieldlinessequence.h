@@ -53,15 +53,28 @@ public:
 
     static documentation::Documentation Documentation();
 
+protected:
+    std::atomic_bool _isLoadingStateFromDisk = false;
+    std::atomic_bool _newStateIsReady = false;
+    std::vector<std::string> _sourceFiles;
+    std::unique_ptr<FieldlinesState> _newState;
+    std::string _modelStr;
+    float _scalingFactor = 1.f;
+
+    // note Elon: rework the case of only one state
+  // hasBeenUpdated only gets sets once, first iteration of update function, to
+  // guarantee the vertext position buffer to be initialized.
+    bool _hasBeenUpdated = false;
+
 private:
     void addStateToSequence(FieldlinesState& STATE);
     void computeSequenceEndTime();
-    void definePropertyCallbackFunctions();
     void extractTriggerTimesFromFileNames();
     bool loadJsonStatesIntoRAM();
     void loadOsflsStatesIntoRAM();
     bool getStatesFromCdfFiles();
     void setModelDependentConstants();
+    void definePropertyCallbackFunctions();
     void setupProperties();
     bool prepareForOsflsStreaming();
 
@@ -91,26 +104,22 @@ private:
     // path to directory with seed point files
     std::filesystem::path _seedPointDirectory;
     // optional except when using json input
-    std::string _modelStr;
+
 
     // Used for 'runtime-states'. True when loading a new state from disk on another
     // thread.
-    std::atomic_bool _isLoadingStateFromDisk = false;
+  
     // False => states are stored in RAM (using 'in-RAM-states'), True => states are
     // loaded from disk during runtime (using 'runtime-states')
     bool _loadingStatesDynamically  = false;
     // Used for 'runtime-states'. True when finished loading a new state from disk on
     // another thread.
-    std::atomic_bool _newStateIsReady = false;
     // True when new state is loaded or user change which quantity to color the lines by
     bool _shouldUpdateColorBuffer   = false;
     // True when new state is loaded or user change which quantity used for masking out
     // line segments
     bool _shouldUpdateMaskingBuffer = false;
-    // note Elon: rework the case of only one state
-    // hasBeenUpdated only gets sets once, first iteration of update function, to
-    // guarantee the vertext position buffer to be initialized.
-    bool _hasBeenUpdated = false;
+  
 
     // Active index of _states. If(==-1)=>no state available for current time. Always the
     // same as _activeTriggerTimeIndex if(_loadingStatesDynamically==true), else
@@ -124,7 +133,7 @@ private:
     size_t _nStates = 0;
     // In setup it is used to scale JSON coordinates. During runtime it is used to scale
     // domain limits.
-    float _scalingFactor = 1.f;
+   
     // Estimated end of sequence.
     // If there's just one state it should never disappear
     double _sequenceEndTime = std::numeric_limits<double>::max();
@@ -141,7 +150,7 @@ private:
 
     // The Lua-Modfile-Dictionary used during initialization
     // Used for 'runtime-states' when switching out current state to a new state
-    std::unique_ptr<FieldlinesState> _newState;
+
     std::unique_ptr<ghoul::opengl::ProgramObject> _shaderProgram;
     // Transfer function used to color lines when _pColorMethod is set to BY_QUANTITY
     std::unique_ptr<TransferFunction> _transferFunction;
@@ -154,7 +163,7 @@ private:
     std::vector<glm::vec2> _maskingRanges;
     // Stores the provided source file paths if using 'runtime-states', else emptied after
     // initialization
-    std::vector<std::string> _sourceFiles;
+
     // Extra variables such as rho, p or t
     std::vector<std::string> _extraVars;
     // Contains the _triggerTimes for all FieldlineStates in the sequence
