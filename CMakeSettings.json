@@ -12,23 +12,33 @@
       "ctestCommandArgs": "",
       "variables": [
         {
-            "name": "OPENSPACE_MODULE_FIELDLINESSEQUENCE",
-            "value": "True",
-            "type": "BOOL"
+          "name": "OPENSPACE_MODULE_FIELDLINESSEQUENCE",
+          "value": "True",
+          "type": "BOOL"
         },
         {
-            "name": "OPENSPACE_MODULE_FLUXROPE",
-            "value": "True",
-            "type": "BOOL"
+          "name": "OPENSPACE_MODULE_FLUXROPE",
+          "value": "True",
+          "type": "BOOL"
         },
         {
           "name": "Boost_DIR",
-          "value": "C:/Boost/boost_1_81_0",
+          "value": "C:/boost/boost_1_81_0",
           "type": "PATH"
         },
         {
           "name": "Boost_INCLUDE_DIR",
-          "value": "C:/Boost/boost_1_81_0",
+          "value": "C:/boost/boost_1_81_0",
+          "type": "PATH"
+        },
+        {
+          "name": "Boost_LIBRARIES",
+          "value": "C:/boost/boost_1_83_0",
+          "type": "PATH"
+        },
+        {
+          "name": "Boost_INCLUDE_DIRS",
+          "value": "C:/boost/boost_1_83_0",
           "type": "PATH"
         }
       ]
