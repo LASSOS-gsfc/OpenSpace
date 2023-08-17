@@ -1,8 +1,6 @@
 asset.require("spice/base")
 local transforms = asset.require("scene/solarsystem/sun/transforms")
 
-
-
 local EarthTrail = {
   Identifier = "EarthTrail",
   Parent = transforms.SolarSystemBarycenter.Identifier,
@@ -24,7 +22,6 @@ local EarthTrail = {
   }
 }
 
-
 asset.onInitialize(function()
   openspace.addSceneGraphNode(EarthTrail)
 end)
@@ -34,8 +31,6 @@ asset.onDeinitialize(function()
 end)
 
 asset.export(EarthTrail)
-
-
 
 asset.meta = {
   Name = "Earth Trail",

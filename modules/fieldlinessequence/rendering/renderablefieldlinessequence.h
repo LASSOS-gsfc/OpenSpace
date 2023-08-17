@@ -115,6 +115,7 @@ private:
 
     // Used for 'runtime-states'. True when finished loading a new state from disk on
     // another thread.
+    //   
     // True when new state is loaded or user change which quantity to color the lines by
     bool _shouldUpdateColorBuffer   = false;
     // True when new state is loaded or user change which quantity used for masking out
