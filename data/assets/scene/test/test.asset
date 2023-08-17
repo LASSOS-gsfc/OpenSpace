@@ -5,7 +5,7 @@ local propertyHelper = asset.require("util/property_helper")
 
 local psptransforms = asset.require("scene/psp/transforms")
 
-local directory = "C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\OpenSpace2\\OpenSpace\\data\\assets\\scene\\test\\testfieldline\\"
+local directory = "C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\OpenSpace\\OpenSpace\\data\\assets\\scene\\test\\testfieldline\\"
 
 local sunRadius = 6.957E8
 
@@ -22,8 +22,6 @@ local keyframes = {
         Position = {au_to_m/5,0,0}
     },
 }
-
-
 
 local fieldlines = {
     Identifier = "test",
