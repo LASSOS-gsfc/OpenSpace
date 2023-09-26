@@ -1,0 +1,120 @@
+--PSP Model 
+
+local sunTransforms = asset.require('scene/solarsystem/sun/transforms')
+local transforms = asset.require('./transforms')
+local kernels = asset.require('./kernels')
+
+local LightSources = {
+  {
+    Type = "SceneGraphLightSource",
+    Identifier = "Sun",
+    Node = sunTransforms.SolarSystemBarycenter.Identifier,
+    Intensity = 1.0
+  },
+}
+
+
+local missionBegin = "2018 Aug 12 07:31:00"
+local foreverEnd = "2028 JAN 31 23:26:59" -- original "2022 MAR 29 00:00:00"
+
+
+local PSP = {
+    Identifier = "PSP",
+    Parent = transforms.pspPosition.Identifier, 
+    Transform = {
+        Rotation = {
+            Type = "FixedRotation",
+            Attached = "PSP",
+            XAxis = {0.01, -1, 0.56},
+            XAxisOrthogonal = true,
+            YAxis = sunTransforms.SolarSystemBarycenter.Identifier
+        },
+        TimeFrame = {
+            Type = "TimeFrameInterval",
+            Start = missionBegin,
+            End = foreverEnd
+        },
+        Scale = {
+            Type = "StaticScale",
+            Scale = 0.0075
+        }
+    },
+    Renderable = {
+        Type = "RenderableModel",
+        Body = "PSP",
+        GeometryFile = asset.localResource("parkersolarprobe_model/PSP2.fbx"),
+        RotationVector = {90, 180, 0},
+        LightSources = LightSources,
+        AmbientIntensity = 0.05,
+        SpecularIntensity = 0.0
+    },
+    GUI = {
+        Name = "Parker Solar Probe Model",
+        Path = "/Solar System/Missions/Parker Solar Probe/Model"
+    }
+}
+
+local pspTrail = {
+    Identifier = "pspTrail",
+    Parent = sunTransforms.SolarSystemBarycenter.Identifier,
+    Renderable = {
+        Type = "RenderableTrailTrajectory",
+        Translation = {
+            Type = "SpiceTranslation",
+            Target = "-96", 
+            Observer = "SUN",
+            Frame = "GALACTIC",
+            Kernels = kernels.pspKernels
+        },
+        Color = {0.33, 0.15, 0.52 },
+        EnableFade = false,
+        StartTime = missionBegin,
+        EndTime = foreverEnd,
+        SampleInterval = 7000,
+    },
+    GUI = {
+        Name = "Parker Solar Probe Trail",
+        Path = "/Solar System/Missions/Parker Solar Probe/Trail"
+    }
+}
+
+local setTime = {
+    Identifier = "setTime",
+    Name = "Set Time to Mission Begin",
+    Command = 'openspace.time.setTime("2018 Aug 12 07:31:00")',
+    GuiPath = "/Missions/Parker Solar Probe",
+    IsLocal = true
+}
+
+
+local pspFocus = {
+    Identifier = "pspFocus",
+    Name = "Set Focus to Parker Solar Probe",
+    Command = [[
+        openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Aim", '');
+        openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.RetargetAnchor", nil);
+        openspace.setPropertyValueSingle("NavigationHandler.OrbitalNavigator.Anchor", "PSP");
+    ]],
+    GuiPath = "/Missions/Parker Solar Probe",
+    IsLocal = true
+}
+
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(PSP)
+  openspace.addSceneGraphNode(pspTrail)
+  openspace.action.registerAction(setTime)
+  openspace.action.registerAction(pspFocus)
+end)
+
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(PSP)
+  openspace.removeSceneGraphNode(pspTrail)
+  openspace.action.removeAction(setTime)
+  openspace.action.removeAction(pspFocus)
+end)
+
+asset.export(PSP)
+asset.export(pspTrail)
+asset.export(setTime)
+asset.export(pspFocus)

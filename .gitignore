@@ -48,3 +48,5 @@ config/schema/sgct.schema.json
 /out/
 /data/scene/psp/spice/
 /data/assets/scene/psp/spice
+/data/assets/scene/parkersolarprobe/parkersolarprobe_kernels 
+/data/assets/scene/parkersolarprobe/parkersolarprobe_model

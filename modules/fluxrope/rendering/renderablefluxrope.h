@@ -25,6 +25,7 @@ namespace openspace {
         void readNewJsonState(const std::string& filePath);
 
         properties::TriggerProperty _loadNewPointsBtn;
+        properties::TriggerProperty _runPythonBtn;
         properties::StringProperty _fluxRopeFilePath;
     };
 }

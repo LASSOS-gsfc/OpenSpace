@@ -1,0 +1,41 @@
+--PSP Kernels
+
+local pspKernels = {
+
+	asset.localResource("parkersolarprobe_kernels/lsk/naif0012.tls"),
+	asset.localResource("parkersolarprobe_kernels/fk/spp_v210.tf"),
+	asset.localResource("parkersolarprobe_kernels/fk/spp_dyn_v201.tf"),
+	asset.localResource("parkersolarprobe_kernels/ik/epihi_v100.ti"),
+	asset.localResource("parkersolarprobe_kernels/ik/spp_epilo_v100.ti"),
+	asset.localResource("parkersolarprobe_kernels/ik/spp_fields_v100.ti"),
+	asset.localResource("parkersolarprobe_kernels/ik/spp_sweap_v100.ti"),
+	asset.localResource("parkersolarprobe_kernels/sclk/spp_sclk_0968.tsc"),
+	asset.localResource("parkersolarprobe_kernels/pck/pck00010.tpc"),
+	asset.localResource("parkersolarprobe_kernels/ck/spp_2018_att.bc"),
+	asset.localResource("parkersolarprobe_kernels/ck/spp_2019_att.bc"),
+	asset.localResource("parkersolarprobe_kernels/ck/spp_2020_att.bc"),
+	asset.localResource("parkersolarprobe_kernels/ck/spp_2021_att.bc"),
+	asset.localResource("parkersolarprobe_kernels/ck/spp_2022_doy116_att.bc"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20180812_20181008_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20181008_20190120_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20190120_20190416_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20190416_20190914_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20190914_20200101_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20200101_20200301_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20200301_20200505_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20200505_20200705_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20200705_20200802_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20200802_20201016_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20201016_20210101_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20210101_20210226_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20210226_20210325_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20210325_20210525_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20210524_20210723_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20210723_20210904_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20210904_20211104_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20211104_20211217_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/spp_recon_20211217_20220329_v001.bsp"),
+	asset.localResource("parkersolarprobe_kernels/spk/parker_solar_probe_20220329_20280131.bsp")
+}
+
+asset.export("pspKernels", pspKernels)

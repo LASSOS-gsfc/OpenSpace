@@ -41,6 +41,13 @@ namespace {
         openspace::properties::Property::Visibility::NoviceUser
     };
 
+    constexpr openspace::properties::Property::PropertyInfo PythonBtnInfo = {
+      "RunPython",
+      "Run python code",
+      "Runs python code for generating points",
+      openspace::properties::Property::Visibility::NoviceUser
+    };
+
     struct [[codegen::Dictionary(RenderableFluxRope)]] Parameters {
 
         std::string fluxRopePath;
@@ -61,7 +68,8 @@ namespace openspace {
     RenderableFluxRope::RenderableFluxRope(const ghoul::Dictionary& dictionary) 
         : RenderableFieldlinesSequence(dictionary), 
         _loadNewPointsBtn(PointsBtnInfo),
-        _fluxRopeFilePath(PathToPointsFileInfo ) 
+        _fluxRopeFilePath(PathToPointsFileInfo ),
+        _runPythonBtn(PythonBtnInfo)
     
     {
         const Parameters p = codegen::bake<Parameters>(dictionary);
@@ -81,6 +89,10 @@ namespace openspace {
             _loadingStatesDynamically = true; 
             if (!_fluxRopeFilePath.value().empty()) loadNewJsonStateIntoRAM();
             });
+        _runPythonBtn.onChange([this]() {
+            std::system("C:\\Python310\\python.exe \"C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\Flux rope file\\main.py \"");
+
+            });
     }
 
     void RenderableFluxRope::setupProperties() {
@@ -88,6 +100,7 @@ namespace openspace {
 
         addProperty(_loadNewPointsBtn);
         addProperty(_fluxRopeFilePath);
+        addProperty(_runPythonBtn);
         definePropertyCallbackFunctions();
     }
 

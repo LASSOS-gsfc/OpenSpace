@@ -1,11 +1,13 @@
 local transforms = asset.require("scene/test/fieldline_transform")
 local earth_transforms = asset.require("scene/solarsystem/planets/earth/transforms")
 local magnetosphere_transforms = asset.require("scene/solarsystem/planets/earth/magnetosphere/transforms_magnetosphere")
+local sunTransforms = asset.require("scene/solarsystem/sun/transforms")
 local propertyHelper = asset.require("util/property_helper")
 
-local psptransforms = asset.require("scene/psp/transforms")
+local pspTransforms = asset.require("scene/parkersolarprobe/transforms")
 
-local directory = "C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\OpenSpace\\OpenSpace\\data\\assets\\scene\\test\\testfieldline\\"
+
+local directory = asset.localResource("./testfieldline/")
 
 local sunRadius = 6.957E8
 
@@ -15,30 +17,46 @@ local keyframes = {
 
     ['2023-03-30T12:00:00'] = {
         Type = "StaticTranslation",
-        Position = {-au_to_m/5,0,0}
+        Position = {-au_to_m/8,0,0}
     },
     ['2023-03-30T13:00:00'] = {
         Type = "StaticTranslation",
-        Position = {au_to_m/5,0,0}
+        Position = {au_to_m/8,0,0}
     },
+
+}
+
+local parkerFrame = {
+    parent = sunTransforms.SunCenter.Identifier,
+    Identifier = "ParkerFrame",
+    Transform = {
+        Translation = {
+            Type = "SpiceTranslation",
+            Target = "-96",
+            Observer = "SUN",
+            FixedDate =  "2023-03-30T00-00-00-000",
+
+        },
+           Rotation = {
+            Type = "SpiceRotation",
+            SourceFrame = "HEEQ180",
+            DestinationFrame = "-96",
+            FixedDateInfo = "2023-03-30T00-00-00-000",
+      }
+    
+    }
 }
 
 local fieldlines = {
     Identifier = "test",
-    Parent = psptransforms.PSP_RTN.Identifier,
+    Parent =parkerFrame.Identifier,
      Transform = {
-   
-  
-
      Translation = {
            Type = "TimelineTranslation",
            ShouldInterpolate = true,
            Keyframes = keyframes,   
       },
-      Rotation = {
-            Type = "StaticRotation",
-            Rotation = {0,90,0}
-      }
+   
   },
     Renderable = {
         Type = "RenderableFluxRope",
@@ -69,13 +87,18 @@ local toggle_fieldlines = {
 
 
 asset.onInitialize(function ()
+  openspace.addSceneGraphNode(parkerFrame)
   openspace.action.registerAction(toggle_fieldlines)
   openspace.addSceneGraphNode(fieldlines)
+
 end)
 
+
 asset.onDeinitialize(function ()
+  openspace.removeSceneGraphNode(parkerFrame)
   openspace.removeSceneGraphNode(fieldlines)
   openspace.action.removeAction(toggle_fieldlines)
+
 end)
 
 asset.export(fieldlines)

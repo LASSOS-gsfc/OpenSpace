@@ -1,0 +1,41 @@
+--PSP Transforms
+
+local sunTransforms = asset.require('scene/solarsystem/sun/transforms')
+local kernels = asset.require('./kernels')
+
+local missionBegin = "2018 Aug 12 07:31:00"
+local foreverEnd = "2022 MAR 29 00:00:00"
+
+local pspPosition = {
+	Identifier = "pspPosition",
+    Parent = sunTransforms.SolarSystemBarycenter.Identifier, 
+    Transform = {
+        Translation = {
+            Type = "SpiceTranslation",
+            Target = "-96",
+            Observer = "SUN",
+            Frame = "GALACTIC",
+            Kernels = kernels.pspKernels
+        },
+        TimeFrame = {
+            Type = "TimeFrameInterval",
+            Start = missionBegin,
+            End = foreverEnd,
+        }
+    },
+    GUI = {
+        Hidden = true,
+        Name = "Parker Solar Probe",
+        Path = "/Solar System/Missions/Parker Solar Probe/Position"
+    }
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(pspPosition)
+end)
+
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(pspPosition)
+end)
+
+asset.export(pspPosition)
