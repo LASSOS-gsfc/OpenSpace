@@ -62,6 +62,7 @@ namespace {
         std::vector<std::string> propNames;
         std::vector<double> initialVals;
         std::string pythonPath;
+        std::string fluxRopePath;
 
     };
 
@@ -87,6 +88,8 @@ namespace openspace {
         _propNames = p.propNames;
 
         _pythonPath = p.pythonPath;
+
+        _fluxRopePath = p.fluxRopePath;
 
         auto iVal = p.initialVals.begin();
 
@@ -150,7 +153,7 @@ namespace openspace {
         if (!_isLoadingStateFromDisk && !_newStateIsReady) {
             _isLoadingStateFromDisk = true;
 
-            std::string filePath = "C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\OpenSpace\\OpenSpace\\data\\assets\\scene\\test\\testfieldline\\2023-03-30T00-00-00-000.json";
+            std::string filePath = _fluxRopePath;
 
             // make again
             std::thread readBinaryThread([this, f = std::move(filePath)]() {

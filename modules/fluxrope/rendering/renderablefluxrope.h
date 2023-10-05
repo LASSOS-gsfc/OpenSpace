@@ -31,6 +31,7 @@ namespace openspace {
         std::map<std::string, properties::StringProperty> _fluxRopeProps;
         std::map<std::string, double> _codeInputs;
         std::vector<std::string> _propNames; 
+        std::string _fluxRopePath;
         
     };
 }

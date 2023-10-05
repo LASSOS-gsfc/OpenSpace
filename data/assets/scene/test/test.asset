@@ -10,6 +10,7 @@ local pspTransforms = asset.require("scene/parkersolarprobe/transforms")
 local directory = asset.localResource("./testfieldline/")
 local PythonPath = "C:\\Python310\\python.exe"
 local ScriptPath = "C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\Flux rope file\\main.py"
+local FluxRopePath = asset.localResource("./testfieldline/2023-03-30T00-00-00-000.json")
 
 local sunRadius = 6.957E8
 
@@ -64,6 +65,7 @@ local fieldlines = {
         Type = "RenderableFluxRope",
         LineWidth = 1.0,
         SourceFolder = directory,
+        FluxRopePath = FluxRopePath, 
         AlphaBlendlingEnabled = false,
         InputFileType = "Json",
         ScaleToMeters = au_to_m/100,
