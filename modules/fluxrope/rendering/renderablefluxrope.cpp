@@ -25,6 +25,8 @@
 
 
 namespace {
+    
+
     constexpr std::string_view _loggerCat = "RenderableFluxRope";
     // don't know if this is the right way to do this
     constexpr openspace::properties::Property::PropertyInfo PointsBtnInfo = {
@@ -47,12 +49,19 @@ namespace {
       "Runs python code for generating points",
       openspace::properties::Property::Visibility::NoviceUser
     };
+    constexpr openspace::properties::Property::PropertyInfo ParamsInfo = {
+      "FluxRopeParams",
+      "Input params for flux rope code",
+      "Runs python code for generating points",
+      openspace::properties::Property::Visibility::NoviceUser
+    };
 
     struct [[codegen::Dictionary(RenderableFluxRope)]] Parameters {
 
-        std::string fluxRopePath;
-
-        
+        std::string scriptPath;
+        std::vector<std::string> propNames;
+        std::vector<double> initialVals;
+        std::string pythonPath;
 
     };
 
@@ -68,13 +77,30 @@ namespace openspace {
     RenderableFluxRope::RenderableFluxRope(const ghoul::Dictionary& dictionary) 
         : RenderableFieldlinesSequence(dictionary), 
         _loadNewPointsBtn(PointsBtnInfo),
-        _fluxRopeFilePath(PathToPointsFileInfo ),
+        _scriptPath(PathToPointsFileInfo ),
         _runPythonBtn(PythonBtnInfo)
-    
     {
         const Parameters p = codegen::bake<Parameters>(dictionary);
 
-        _fluxRopeFilePath = absPath(p.fluxRopePath).string();
+        _scriptPath = absPath(p.scriptPath).string();
+
+        _propNames = p.propNames;
+
+        _pythonPath = p.pythonPath;
+
+        auto iVal = p.initialVals.begin();
+
+        for (auto& name : _propNames) {
+            openspace::properties::Property::PropertyInfo info = {
+                name.data(),name.data(),name.data(),
+                 openspace::properties::Property::Visibility::NoviceUser
+            };
+            properties::StringProperty props(info);
+            props = std::to_string(*iVal);
+            _fluxRopeProps.insert({ name,props });
+            ++iVal;
+
+        }
     
     }
 
@@ -87,20 +113,35 @@ namespace openspace {
     void RenderableFluxRope::definePropertyCallbackFunctions() {
         _loadNewPointsBtn.onChange([this]() {
             _loadingStatesDynamically = true; 
-            if (!_fluxRopeFilePath.value().empty()) loadNewJsonStateIntoRAM();
+            if (!_scriptPath.value().empty()) loadNewJsonStateIntoRAM();
             });
-        _runPythonBtn.onChange([this]() {
-            std::system("C:\\Python310\\python.exe \"C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\Flux rope file\\main.py \"");
 
+
+        _runPythonBtn.onChange([this]() {
+ 
+            std::string argv = "\"{";
+            for (auto& _prop : _fluxRopeProps) argv += "\\\"" + _prop.first + "\\\":"+_prop.second.value() + ",";
+            argv.pop_back();
+            argv += "}\"";
+            std::string command = _pythonPath + " \"" + _scriptPath.value() + "\" " + argv;
+            LWARNING(fmt::format("running command at: {}", command));
+        //    std::system("C:\\Python310\\python.exe \"C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\Flux rope file\\main.py \"");
+            std::system(command.data());
             });
+        /**/
+       
+
     }
 
     void RenderableFluxRope::setupProperties() {
    //     RenderableFieldlinesSequence::setupProperties();
 
         addProperty(_loadNewPointsBtn);
-        addProperty(_fluxRopeFilePath);
+        addProperty(_scriptPath);
         addProperty(_runPythonBtn);
+        for (auto& _prop : _fluxRopeProps) {
+            addProperty(_prop.second);
+        }
         definePropertyCallbackFunctions();
     }
 
@@ -108,8 +149,10 @@ namespace openspace {
 
         if (!_isLoadingStateFromDisk && !_newStateIsReady) {
             _isLoadingStateFromDisk = true;
-     
-            std::string filePath = _fluxRopeFilePath.value();
+
+            std::string filePath = "C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\OpenSpace\\OpenSpace\\data\\assets\\scene\\test\\testfieldline\\2023-03-30T00-00-00-000.json";
+
+            // make again
             std::thread readBinaryThread([this, f = std::move(filePath)]() {
                 readNewJsonState(f);
                 });

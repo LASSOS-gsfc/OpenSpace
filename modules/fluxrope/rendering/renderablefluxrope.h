@@ -26,7 +26,12 @@ namespace openspace {
 
         properties::TriggerProperty _loadNewPointsBtn;
         properties::TriggerProperty _runPythonBtn;
-        properties::StringProperty _fluxRopeFilePath;
+        properties::StringProperty _scriptPath;
+        std::string  _pythonPath;
+        std::map<std::string, properties::StringProperty> _fluxRopeProps;
+        std::map<std::string, double> _codeInputs;
+        std::vector<std::string> _propNames; 
+        
     };
 }
 

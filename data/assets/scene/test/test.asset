@@ -8,6 +8,8 @@ local pspTransforms = asset.require("scene/parkersolarprobe/transforms")
 
 
 local directory = asset.localResource("./testfieldline/")
+local PythonPath = "C:\\Python310\\python.exe"
+local ScriptPath = "C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\Flux rope file\\main.py"
 
 local sunRadius = 6.957E8
 
@@ -34,16 +36,10 @@ local parkerFrame = {
             Type = "SpiceTranslation",
             Target = "-96",
             Observer = "SUN",
-            FixedDate =  "2023-03-30T00-00-00-000",
+            FixedDateInfo =  "2023-03-30T00-00-00-000",
 
         },
-           Rotation = {
-            Type = "SpiceRotation",
-            SourceFrame = "HEEQ180",
-            DestinationFrame = "-96",
-            FixedDateInfo = "2023-03-30T00-00-00-000",
-      }
-    
+         
     }
 }
 
@@ -56,6 +52,12 @@ local fieldlines = {
            ShouldInterpolate = true,
            Keyframes = keyframes,   
       },
+       Rotation = {
+            Type = "SpiceRotation",
+            SourceFrame = "HEEQ180",
+            DestinationFrame = "-96",
+            FixedDateInfo = "2023-03-30T00-00-00-000",
+            }
    
   },
     Renderable = {
@@ -65,7 +67,10 @@ local fieldlines = {
         AlphaBlendlingEnabled = false,
         InputFileType = "Json",
         ScaleToMeters = au_to_m/100,
-        FluxRopePath = "C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\OpenSpace\\OpenSpace\\data\\assets\\scene\\test\\testfieldline\\2023-03-30T00-00-00-000.json",
+        ScriptPath =ScriptPath,
+        PythonPath = PythonPath,
+        PropNames =   {"r",   "delta","y0", "By0", "C10", "tau", "n",  "m",  "h"},
+        InitialVals = {0.1,1.0, 0.07 / 2, 10, 1, 1.1, 1, 0, 1}
     },
 
      GUI = {
