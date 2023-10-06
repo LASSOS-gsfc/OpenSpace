@@ -36,10 +36,10 @@ namespace {
        openspace::properties::Property::Visibility::NoviceUser
     };
 
-    constexpr openspace::properties::Property::PropertyInfo PathToPointsFileInfo = {
-        "PathToPoints",
-        "Path to new flux rope file",
-        "This is the path to a new set a points to be rendered",
+    constexpr openspace::properties::Property::PropertyInfo PythonFileInfo = {
+        "PathToPythonFile",
+        "Path to python file",
+        "This is the path to python file",
         openspace::properties::Property::Visibility::NoviceUser
     };
 
@@ -78,7 +78,7 @@ namespace openspace {
     RenderableFluxRope::RenderableFluxRope(const ghoul::Dictionary& dictionary) 
         : RenderableFieldlinesSequence(dictionary), 
         _loadNewPointsBtn(PointsBtnInfo),
-        _scriptPath(PathToPointsFileInfo ),
+        _scriptPath(PythonFileInfo ),
         _runPythonBtn(PythonBtnInfo)
     {
         const Parameters p = codegen::bake<Parameters>(dictionary);
@@ -123,7 +123,17 @@ namespace openspace {
         _runPythonBtn.onChange([this]() {
  
             std::string argv = "\"{";
-            for (auto& _prop : _fluxRopeProps) argv += "\\\"" + _prop.first + "\\\":"+_prop.second.value() + ",";
+            for (auto& _prop : _fluxRopeProps) {
+                try {
+                    std::stof(_prop.second.value());
+                    argv += "\\\"" + _prop.first + "\\\":" + _prop.second.value() + ",";
+                }
+                catch (...) {
+                    LERROR("Input not a valid number");
+                    return; 
+                }
+              
+            }
             argv.pop_back();
             argv += "}\"";
             std::string command = _pythonPath + " \"" + _scriptPath.value() + "\" " + argv;

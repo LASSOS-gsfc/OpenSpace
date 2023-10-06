@@ -1,4 +1,4 @@
-local transforms = asset.require("scene/test/fieldline_transform")
+local transforms = asset.require("scene/fluxrope/fieldline_transform")
 local earth_transforms = asset.require("scene/solarsystem/planets/earth/transforms")
 local magnetosphere_transforms = asset.require("scene/solarsystem/planets/earth/magnetosphere/transforms_magnetosphere")
 local sunTransforms = asset.require("scene/solarsystem/sun/transforms")
@@ -45,7 +45,7 @@ local parkerFrame = {
 }
 
 local fieldlines = {
-    Identifier = "test",
+    Identifier = "fluxrope",
     Parent =parkerFrame.Identifier,
      Transform = {
      Translation = {
