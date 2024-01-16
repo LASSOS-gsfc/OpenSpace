@@ -1,0 +1,50 @@
+asset.require("spice/base")
+
+local Sun = {
+  Identifier = "Sun",
+  Renderable = {
+    Type = "RenderableGlobe",
+    Enabled = true,
+    Radii = 5.0,
+    SegmentsPerPatch = 64,
+    Segments = 10,
+    Layers = {},
+    PerformShading = false
+  },
+  ApproachFactor = 15.0,
+  GUI = {
+    Name = "Sun",
+    Path = "/Solar System/Sun",
+    Description = "Globe for the sun in our solar system"
+  }
+}
+
+
+local LightSource = {
+  Type = "SceneGraphLightSource",
+  Identifier = "Sun",
+  Node = Sun.Identifier,
+  Intensity = 1.0
+}
+
+asset.onInitialize(function()
+  openspace.addSceneGraphNode(Sun)
+end)
+
+asset.onDeinitialize(function()
+  openspace.removeSceneGraphNode(Sun)
+end)
+
+asset.export(Sun)
+asset.export("LightSource", LightSource)
+
+
+
+asset.meta = {
+  Name = "Sun",
+  Version = "1.1",
+  Description = "The Sun and label",
+  Author = "OpenSpace Team",
+  URL = "http://openspaceproject.com",
+  License = "MIT license"
+}

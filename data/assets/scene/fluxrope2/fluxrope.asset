@@ -10,7 +10,7 @@ local pspTransforms = asset.require("scene/parkersolarprobe/transforms")
 local directory = asset.localResource("./testfieldline/")
 local PythonPath = "C:\\Python310\\python.exe"
 local ScriptPath = "C:\\Users\\eatoc\\OneDrive\\Documents\\My Documents\\NASA\\Flux rope file\\main.py"
-local FluxRopePath = asset.localResource("./parkerfluxrope/2023-03-30T00-00-00-000.json")
+local FluxRopePath = asset.localResource("./testfieldline/2023-03-31T00-00-00-000.json")
 
 local sunRadius = 6.957E8
 
@@ -29,13 +29,13 @@ local keyframes = {
 
 }
 
-local parkerFrame = {
+local earthFrame = {
     parent = sunTransforms.SunCenter.Identifier,
-    Identifier = "ParkerFrame",
+    Identifier = "EFrame",
     Transform = {
         Translation = {
             Type = "SpiceTranslation",
-            Target = "-96",
+            Target = "EARTH",
             Observer = "SUN",
             FixedDateInfo =  "2023-03-30T00-00-00-000",
 
@@ -45,45 +45,6 @@ local parkerFrame = {
 }
 
 local fieldlines = {
-    Identifier = "fluxrope",
-    Parent =parkerFrame.Identifier,
-     Transform = {
-     Translation = {
-           Type = "TimelineTranslation",
-           ShouldInterpolate = true,
-           Keyframes = keyframes,   
-      },
-       Rotation = {
-            Type = "SpiceRotation",
-            SourceFrame = "HEEQ180",
-            DestinationFrame = "-96",
-            FixedDateInfo = "2023-03-30T00-00-00-000",
-            }
-   
-  },
-    Renderable = {
-        Type = "RenderableFluxRope",
-        LineWidth = 1.0,
-        SourceFolder = directory,
-        FluxRopePath = FluxRopePath, 
-        AlphaBlendlingEnabled = false,
-        InputFileType = "Json",
-        ScaleToMeters = au_to_m/100,
-        ScriptPath =ScriptPath,
-        PythonPath = PythonPath,
-        PropNames =   {"r","delta","y0", "By0", "C10", "tau", "n",  "m",  "h"},
-        InitialVals = {0.1,1.0, 0.07 / 2, 10, 1, 1.1, 1, 0, 1}
-    },
-
-     GUI = {
-        Name = "test",
-        Path = "/test",
-        Hidden = false
-    }
-  
-}
-
-local earth_fieldlines = {
     Identifier = "fluxrope2",
     Parent =earth_transforms.EarthBarycenter.Identifier,
      Transform = {
@@ -122,23 +83,25 @@ local earth_fieldlines = {
   
 }
 
-
-
+local toggle_fieldlines = {
+  Identifier = "os.events.fieldlines.togglefieldlines",
+  Name = "Toggle Fieldlines",
+  Command = propertyHelper.invert("Scene.test.Renderable.Enabled"),
+  Documentation = "Toggle fieldline rendering of CME",
+  GuiPath = "/test",
+  IsLocal = false
+}
 
 
 asset.onInitialize(function ()
-  openspace.addSceneGraphNode(parkerFrame)
   openspace.addSceneGraphNode(fieldlines)
-  openspace.addSceneGraphNode(earth_fieldlines)
-
+  openspace.addSceneGraphNode(earthFrame)
 end)
 
 
 asset.onDeinitialize(function ()
-  openspace.removeSceneGraphNode(parkerFrame)
   openspace.removeSceneGraphNode(fieldlines)
-  openspace.removeSceneGraphNode(earth_fieldlines)
-
+  openspace.removeSceneGraphNode(earthFrame)
 end)
 
 asset.export(fieldlines)

@@ -1,0 +1,32 @@
+Geocentric Solar Equatorial (GSM) frame:
+Used by the BATSRUS model
+This Kernel's ID is not a valid ID!
+
+ +X is parallel to the geometric earth-sun position vector.
+
+ +Z axis is normalized component of north centered geomagnetic dipole
+ vector orthogonal to GSM +X axis.
+
+ +Y completes the right-handed frame.
+
+\begindata
+
+
+        FRAME_GSE                    =  1803311
+        FRAME_1803311_NAME           = 'GSE'
+        FRAME_1803311_CLASS          =  5
+        FRAME_1803311_CLASS_ID       =  1803311
+        FRAME_1803311_CENTER         =  399
+        FRAME_1803311_RELATIVE       = 'J2000'
+        FRAME_1803311_DEF_STYLE      = 'PARAMETERIZED'
+        FRAME_1803311_FAMILY         = 'TWO-VECTOR'
+        FRAME_1803311_PRI_AXIS       = 'X'
+        FRAME_1803311_PRI_VECTOR_DEF = 'OBSERVER_TARGET_POSITION'
+        FRAME_1803311_PRI_OBSERVER   = 'EARTH'
+        FRAME_1803311_PRI_TARGET     = 'SUN'
+        FRAME_1803311_PRI_ABCORR     = 'NONE'
+        FRAME_1803311_SEC_AXIS       = 'Z'
+        FRAME_1803311_SEC_VECTOR_DEF = 'CONSTANT'
+        FRAME_1803311_SEC_FRAME      = 'ECLIPDATE'
+        FRAME_1803311_SEC_SPEC       = 'RECTANGULAR'
+        FRAME_1803311_SEC_VECTOR     = ( 0, 0, 1 )
