@@ -43,10 +43,13 @@
 #include <modules/base/rendering/grids/renderablegrid.h>
 #include <modules/base/rendering/grids/renderableradialgrid.h>
 #include <modules/base/rendering/grids/renderablesphericalgrid.h>
+#include <modules/base/rendering/pointcloud/renderablepointcloud.h>
+#include <modules/base/rendering/pointcloud/renderablepolygoncloud.h>
 #include <modules/base/rendering/renderablecartesianaxes.h>
 #include <modules/base/rendering/renderabledisc.h>
 #include <modules/base/rendering/renderablelabel.h>
 #include <modules/base/rendering/renderablemodel.h>
+#include <modules/base/rendering/renderablenodearrow.h>
 #include <modules/base/rendering/renderablenodeline.h>
 #include <modules/base/rendering/renderablesphereimagelocal.h>
 #include <modules/base/rendering/renderablesphereimageonline.h>
@@ -136,12 +139,15 @@ void BaseModule::internalInitialize(const ghoul::Dictionary&) {
     fRenderable->registerClass<RenderableGrid>("RenderableGrid");
     fRenderable->registerClass<RenderableLabel>("RenderableLabel");
     fRenderable->registerClass<RenderableModel>("RenderableModel");
+    fRenderable->registerClass<RenderableNodeArrow>("RenderableNodeArrow");
     fRenderable->registerClass<RenderableNodeLine>("RenderableNodeLine");
     fRenderable->registerClass<RenderablePlaneImageLocal>("RenderablePlaneImageLocal");
     fRenderable->registerClass<RenderablePlaneImageOnline>("RenderablePlaneImageOnline");
     fRenderable->registerClass<RenderablePlaneTimeVaryingImage>(
         "RenderablePlaneTimeVaryingImage"
     );
+    fRenderable->registerClass<RenderablePointCloud>("RenderablePointCloud");
+    fRenderable->registerClass<RenderablePolygonCloud>("RenderablePolygonCloud");
     fRenderable->registerClass<RenderablePrism>("RenderablePrism");
     fRenderable->registerClass<RenderableTimeVaryingSphere>(
         "RenderableTimeVaryingSphere"
@@ -222,11 +228,14 @@ std::vector<documentation::Documentation> BaseModule::documentations() const {
         RenderableGrid::Documentation(),
         RenderableLabel::Documentation(),
         RenderableModel::Documentation(),
+        RenderableNodeArrow::Documentation(),
         RenderableNodeLine::Documentation(),
         RenderablePlane::Documentation(),
         RenderablePlaneImageLocal::Documentation(),
         RenderablePlaneImageOnline::Documentation(),
         RenderablePlaneTimeVaryingImage::Documentation(),
+        RenderablePointCloud::Documentation(),
+        RenderablePolygonCloud::Documentation(),
         RenderablePrism::Documentation(),
         RenderableRadialGrid::Documentation(),
         RenderableSphere::Documentation(),

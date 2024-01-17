@@ -271,15 +271,7 @@ void RenderableOrbitalKepler::render(const RenderData& data, RendererTasks&) {
     _programObject->setUniform(_uniformCache.opacity, opacity());
     _programObject->setUniform(_uniformCache.inGameTime, data.time.j2000Seconds());
 
-    glm::dmat4 modelTransform =
-        glm::translate(glm::dmat4(1.0), data.modelTransform.translation) *
-        glm::dmat4(data.modelTransform.rotation) *
-        glm::scale(glm::dmat4(1.0), glm::dvec3(data.modelTransform.scale));
-
-    _programObject->setUniform(
-        _uniformCache.modelView,
-        data.camera.combinedViewMatrix() * modelTransform
-    );
+    _programObject->setUniform(_uniformCache.modelView, calcModelViewTransform(data));
 
     // Because we want the property to work similar to the planet trails
     const float fade = pow(_appearance.lineFade.maxValue() - _appearance.lineFade, 2.f);
@@ -313,7 +305,7 @@ void RenderableOrbitalKepler::updateBuffers() {
 
     if (_startRenderIdx >= _numObjects) {
         throw ghoul::RuntimeError(fmt::format(
-            "Start index {} out of range [0, {}]", _startRenderIdx, _numObjects
+            "Start index {} out of range [0, {}]", _startRenderIdx.value(), _numObjects
         ));
     }
 
@@ -368,7 +360,7 @@ void RenderableOrbitalKepler::updateBuffers() {
         _segmentSize.push_back(
             static_cast<size_t>(scale + (scale / pow(1 - p.eccentricity, 1.2)))
         );
-        _startIndex.push_back(_startIndex[i] + static_cast<GLint>(_segmentSize[i]) + 1);
+        _startIndex.push_back(_startIndex[i] + static_cast<GLint>(_segmentSize[i]));
     }
     _startIndex.pop_back();
 
@@ -376,7 +368,7 @@ void RenderableOrbitalKepler::updateBuffers() {
 
     int numOrbits = static_cast<int>(parameters.size());
     for (int i = 0; i < numOrbits; ++i) {
-        nVerticesTotal += _segmentSize[i] + 1;
+        nVerticesTotal += _segmentSize[i];
     }
     _vertexBufferData.resize(nVerticesTotal);
 
@@ -396,9 +388,9 @@ void RenderableOrbitalKepler::updateBuffers() {
             orbit.epoch
         );
 
-        for (size_t j = 0 ; j < (_segmentSize[orbitIdx] + 1); ++j) {
+        for (size_t j = 0 ; j < (_segmentSize[orbitIdx]); ++j) {
             double timeOffset = orbit.period *
-                static_cast<double>(j) / static_cast<double>(_segmentSize[orbitIdx]);
+                static_cast<double>(j) / static_cast<double>(_segmentSize[orbitIdx] - 1);
 
             glm::dvec3 position = keplerTranslator.position({
                 {},

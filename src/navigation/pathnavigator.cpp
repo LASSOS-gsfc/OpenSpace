@@ -137,7 +137,7 @@ PathNavigator::PathNavigator()
     , _speedScale(SpeedScaleInfo, 1.f, 0.01f, 2.f)
     , _applyIdleBehaviorOnFinish(IdleBehaviorOnFinishInfo, false)
     , _arrivalDistanceFactor(ArrivalDistanceFactorInfo, 2.0, 0.1, 20.0)
-    , _linearRotationSpeedFactor(RotationSpeedFactorInfo, 1.5f, 0.1f, 3.f)
+    , _linearRotationSpeedFactor(RotationSpeedFactorInfo, 2.f, 0.1f, 3.f)
     , _minValidBoundingSphere(MinBoundingSphereInfo, 10.0, 1.0, 3e10)
     , _relevantNodeTags(RelevantNodeTagsInfo)
 {
@@ -208,6 +208,14 @@ bool PathNavigator::isPlayingPath() const {
     return hasCurrentPath() && _isPlaying;
 }
 
+bool PathNavigator::isPaused() const {
+    return hasCurrentPath() && !_isPlaying;
+}
+
+float PathNavigator::estimatedRemainingTimeInPath() const {
+    return hasCurrentPath() ? _currentPath->estimatedRemainingTime(_speedScale) : 0.f;
+}
+
 void PathNavigator::updateCamera(double deltaTime) {
     ghoul_assert(camera() != nullptr, "Camera must not be nullptr");
 
@@ -228,11 +236,19 @@ void PathNavigator::updateCamera(double deltaTime) {
     if (_setCameraToEndNextFrame) {
         LDEBUG("Skipped to end of camera path");
         _currentPath->quitPath();
-        camera()->setPose(_currentPath->endPoint().pose());
+
+        const interaction::Waypoint endPoint = _currentPath->endPoint();
+        camera()->setPose(endPoint.pose());
         global::navigationHandler->orbitalNavigator().setFocusNode(
-            _currentPath->endPoint().nodeIdentifier(),
+            endPoint.nodeIdentifier(),
             false
         );
+        if (endPoint.aimIdentifier().has_value()) {
+            global::navigationHandler->orbitalNavigator().setAimNode(
+                *endPoint.aimIdentifier()
+            );
+        }
+
         handlePathEnd();
         _setCameraToEndNextFrame = false;
         return;
@@ -257,13 +273,21 @@ void PathNavigator::updateCamera(double deltaTime) {
     }
 
     if (!_includeRoll) {
-        removeRollRotation(newPose, deltaTime);
+        removeRollRotation(newPose);
     }
 
     camera()->setPose(newPose);
 
     if (_currentPath->hasReachedEnd()) {
         LINFO("Reached target");
+
+        // Also set the aim once the path is finished, if one should be set
+        if (_currentPath->endPoint().aimIdentifier().has_value()) {
+            global::navigationHandler->orbitalNavigator().setAimNode(
+                *_currentPath->endPoint().aimIdentifier()
+            );
+        }
+
         handlePathEnd();
         return;
     }
@@ -290,7 +314,7 @@ void PathNavigator::createPath(const ghoul::Dictionary& dictionary) {
         // Do nothing
     }
     catch (const ghoul::RuntimeError& e) {
-        LERROR(fmt::format("Could not create path. Reason: ", e.message));
+        LERROR(fmt::format("Could not create path. Reason: {}", e.message));
         return;
     }
 
@@ -322,7 +346,8 @@ void PathNavigator::startPath() {
     if (!global::timeManager->isPaused()) {
         openspace::global::scriptEngine->queueScript(
             "openspace.time.setPause(true)",
-            scripting::ScriptEngine::RemoteScripting::Yes
+            scripting::ScriptEngine::ShouldBeSynchronized::Yes,
+            scripting::ScriptEngine::ShouldSendToRemote::Yes
         );
 
         _startSimulationTimeOnFinish = true;
@@ -413,7 +438,7 @@ double PathNavigator::findValidBoundingSphere(const SceneGraphNode* node) const 
         LDEBUG(fmt::format(
             "The scene graph node '{}' has no, or a very small, bounding sphere. Using "
             "minimal value of {}. This might lead to unexpected results",
-            node->identifier(), _minValidBoundingSphere
+            node->identifier(), _minValidBoundingSphere.value()
         ));
         result = _minValidBoundingSphere;
     }
@@ -437,7 +462,8 @@ void PathNavigator::handlePathEnd() {
     if (_startSimulationTimeOnFinish) {
         openspace::global::scriptEngine->queueScript(
             "openspace.time.setPause(false)",
-            scripting::ScriptEngine::RemoteScripting::Yes
+            scripting::ScriptEngine::ShouldBeSynchronized::Yes,
+            scripting::ScriptEngine::ShouldSendToRemote::Yes
         );
         _startSimulationTimeOnFinish = false;
     }
@@ -448,7 +474,8 @@ void PathNavigator::handlePathEnd() {
                 "'NavigationHandler.OrbitalNavigator.IdleBehavior.ApplyIdleBehavior',"
                 "true"
             ");",
-            openspace::scripting::ScriptEngine::RemoteScripting::Yes
+            openspace::scripting::ScriptEngine::ShouldBeSynchronized::Yes,
+            openspace::scripting::ScriptEngine::ShouldSendToRemote::Yes
         );
     }
 
@@ -534,7 +561,7 @@ SceneGraphNode* PathNavigator::findNodeNearTarget(const SceneGraphNode* node) {
     return nullptr;
 }
 
-void PathNavigator::removeRollRotation(CameraPose& pose, double deltaTime) {
+void PathNavigator::removeRollRotation(CameraPose& pose) {
     // The actual position for the camera does not really matter. Use the origin,
     // to avoid precision problems when we have large values for the position
     const glm::dvec3 cameraPos = glm::dvec3(0.0);

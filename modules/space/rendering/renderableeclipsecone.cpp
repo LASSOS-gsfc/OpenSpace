@@ -277,15 +277,12 @@ void RenderableEclipseCone::render(const RenderData& data, RendererTasks&) {
     _shader->activate();
 
     // Model transform and view transform needs to be in double precision
-    const glm::dmat4 modelTransform =
-        glm::translate(glm::dmat4(1.0), data.modelTransform.translation) *
-        glm::dmat4(data.modelTransform.rotation) *
-        glm::scale(glm::dmat4(1.0), glm::dvec3(data.modelTransform.scale));
-    glm::dmat4 modelViewTransform = data.camera.combinedViewMatrix() * modelTransform;
+    const glm::dmat4 modelViewProjectionTransform =
+        calcModelViewProjectionTransform(data);
 
     _shader->setUniform(
         _uniformCache.modelViewProjectionTransform,
-        data.camera.projectionMatrix() * glm::mat4(modelViewTransform)
+        glm::mat4(modelViewProjectionTransform)
     );
 
     _shader->setUniform(_uniformCache.opacity, opacity());
@@ -336,7 +333,7 @@ std::vector<VBOLayout> calculateShadowPoints(const std::vector<glm::dvec3>& srcT
         const glm::dvec3 dir = glm::normalize(dst - src);
 
         // The start point is the terminator point on the Moon
-        glm::vec3 p1 = dst -dir * lengthScale*1000.0;
+        glm::vec3 p1 = dst;
         vertices.push_back({ p1.x, p1.y, p1.z });
 
         // The end point is calculated by forward propagating the incoming direction
@@ -459,34 +456,9 @@ void RenderableEclipseCone::createCone(double et) {
     );
 
 
-    // 4. Construct the penumbral shadow
-    std::vector<VBOLayout> penumbralVertices;
-    if (_showPenumbralShadow) {
-        penumbralVertices = calculateShadowPoints(
-            resSrc.terminatorPoints,
-            resDst.terminatorPoints,
-            shadowerToLightSource,
-            lightSourceToShadower,
-            distance * static_cast<double>(_shadowLength)
-        );
-
-        // We need to duplicate the first two vertices to close the cylinder at the seam
-        penumbralVertices.push_back(penumbralVertices[0]);
-        penumbralVertices.push_back(penumbralVertices[1]);
-    }
-
-
-    // 5. Construct the umbral shadow
+    // 4. Construct the umbral shadow
     std::vector<VBOLayout> umbralVertices;
     if (_showUmbralShadow) {
-        // For the umbral shadow, we need to mix the terminator points with a 180
-        // degree phase shift, so that the top terminator point of the sun gets matched
-        // with the bottom terminator point of the Moon, etc
-        std::rotate(
-            resSrc.terminatorPoints.begin(),
-            resSrc.terminatorPoints.begin() + resSrc.terminatorPoints.size() / 2,
-            resSrc.terminatorPoints.end()
-        );
         umbralVertices = calculateShadowPoints(
             resSrc.terminatorPoints,
             resDst.terminatorPoints,
@@ -498,6 +470,31 @@ void RenderableEclipseCone::createCone(double et) {
         // We need to duplicate the first two vertices to close the cylinder at the seam
         umbralVertices.push_back(umbralVertices[0]);
         umbralVertices.push_back(umbralVertices[1]);
+    }
+
+
+    // 5. Construct the penumbral shadow
+    std::vector<VBOLayout> penumbralVertices;
+    if (_showPenumbralShadow) {
+        // For the penumbral shadow, we need to mix the terminator points with a 180
+        // degree phase shift, so that the top terminator point of the sun gets matched
+        // with the bottom terminator point of the Moon, etc
+        std::rotate(
+            resSrc.terminatorPoints.begin(),
+            resSrc.terminatorPoints.begin() + resSrc.terminatorPoints.size() / 2,
+            resSrc.terminatorPoints.end()
+        );
+        penumbralVertices = calculateShadowPoints(
+            resSrc.terminatorPoints,
+            resDst.terminatorPoints,
+            shadowerToLightSource,
+            lightSourceToShadower,
+            distance * static_cast<double>(_shadowLength)
+        );
+
+        // We need to duplicate the first two vertices to close the cylinder at the seam
+        penumbralVertices.push_back(penumbralVertices[0]);
+        penumbralVertices.push_back(penumbralVertices[1]);
     }
 
 

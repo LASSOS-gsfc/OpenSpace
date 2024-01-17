@@ -31,7 +31,7 @@
 #include <openspace/util/updatestructures.h>
 #include <ghoul/filesystem/filesystem.h>
 #include <ghoul/glm.h>
-#include <ghoul/misc/misc.h>
+#include <ghoul/misc/stringhelper.h>
 #include <ghoul/opengl/programobject.h>
 #include <fstream>
 #include <optional>
@@ -82,7 +82,7 @@ namespace {
 
         // [[codegen::verbatim(LabelsInfo.description)]]
         std::optional<ghoul::Dictionary> labels
-            [[codegen::reference("space_labelscomponent")]];
+            [[codegen::reference("labelscomponent")]];
     };
 #include "renderableconstellationsbase_codegen.cpp"
 } // namespace
@@ -195,7 +195,7 @@ void RenderableConstellationsBase::initialize() {
     _labels->initialize();
     _labels->loadLabels();
 
-    for (speck::Labelset::Entry& entry : _labels->labelSet().entries) {
+    for (dataloader::Labelset::Entry& entry : _labels->labelSet().entries) {
         if (!entry.identifier.empty()) {
             std::string fullName = constellationFullName(entry.identifier);
             if (!fullName.empty()) {
@@ -214,21 +214,16 @@ void RenderableConstellationsBase::render(const RenderData& data, RendererTasks&
         return;
     }
 
-    const glm::dmat4 modelMatrix =
-        glm::translate(glm::dmat4(1.0), data.modelTransform.translation) * // Translation
-        glm::dmat4(data.modelTransform.rotation) *  // Spice rotation
-        glm::scale(glm::dmat4(1.0), glm::dvec3(data.modelTransform.scale));
-
-    const glm::dmat4 modelViewMatrix = data.camera.combinedViewMatrix() * modelMatrix;
-    const glm::dmat4 projectionMatrix = data.camera.projectionMatrix();
-    const glm::dmat4 modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
+    const glm::dmat4 modelTransform = calcModelTransform(data);
+    const glm::dmat4 modelViewProjectionTransform =
+        calcModelViewProjectionTransform(data, modelTransform);
 
     const glm::vec3 lookup = data.camera.lookUpVectorWorldSpace();
     const glm::vec3 viewDirection = data.camera.viewDirectionWorldSpace();
     glm::vec3 right = glm::cross(viewDirection, lookup);
     const glm::vec3 up = glm::cross(right, viewDirection);
 
-    const glm::dmat4 worldToModelTransform = glm::inverse(modelMatrix);
+    const glm::dmat4 worldToModelTransform = glm::inverse(modelTransform);
     glm::vec3 orthoRight = glm::normalize(
         glm::vec3(worldToModelTransform * glm::vec4(right, 0.f))
     );
@@ -244,7 +239,7 @@ void RenderableConstellationsBase::render(const RenderData& data, RendererTasks&
     const glm::vec3 orthoUp = glm::normalize(
         glm::vec3(worldToModelTransform * glm::dvec4(up, 0.f))
     );
-    _labels->render(data, modelViewProjectionMatrix, orthoRight, orthoUp);
+    _labels->render(data, modelViewProjectionTransform, orthoRight, orthoUp);
 }
 
 } // namespace openspace

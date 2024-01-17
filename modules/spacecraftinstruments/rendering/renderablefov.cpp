@@ -447,20 +447,26 @@ bool RenderableFov::isReady() const {
 glm::dvec3 RenderableFov::orthogonalProjection(const glm::dvec3& vecFov, double time,
                                                const std::string& target) const
 {
-    const glm::dvec3 vecToTarget = SpiceManager::ref().targetPosition(
-        target,
-        _instrument.spacecraft,
-        _instrument.referenceFrame,
-        _instrument.aberrationCorrection,
-        time
-    );
-    const glm::dvec3 fov = SpiceManager::ref().frameTransformationMatrix(
-        _instrument.name,
-        _instrument.referenceFrame,
-        time
-    ) * vecFov;
-    const glm::dvec3 p = glm::proj(vecToTarget, fov);
-    return p  * 1000.0; // km -> m
+    if (target.empty()) {
+        glm::dvec3 vec = glm::dvec3(1.0, 0.0, 0.0);
+        return glm::normalize(glm::cross(vec, vecFov));
+    }
+    else {
+        const glm::dvec3 vecToTarget = SpiceManager::ref().targetPosition(
+            target,
+            _instrument.spacecraft,
+            _instrument.referenceFrame,
+            _instrument.aberrationCorrection,
+            time
+        );
+        const glm::dvec3 fov = SpiceManager::ref().frameTransformationMatrix(
+            _instrument.name,
+            _instrument.referenceFrame,
+            time
+        ) * vecFov;
+        const glm::dvec3 p = glm::proj(vecToTarget, fov);
+        return p * 1000.0; // km -> m
+    }
 }
 
 void RenderableFov::computeIntercepts(double time, const std::string& target,
@@ -758,14 +764,8 @@ void RenderableFov::render(const RenderData& data, RendererTasks&) {
     _program->activate();
 
     // Model transform and view transform needs to be in double precision
-    glm::dmat4 modelTransform =
-        glm::translate(glm::dmat4(1.0), data.modelTransform.translation) *
-        glm::dmat4(data.modelTransform.rotation) *
-        glm::scale(glm::dmat4(1.0), glm::dvec3(data.modelTransform.scale));
-
     glm::mat4 modelViewProjectionTransform =
-        data.camera.projectionMatrix() *
-        glm::mat4(data.camera.combinedViewMatrix() * modelTransform);
+        calcModelViewProjectionTransform(data);
 
     _program->setUniform(_uniformCache.modelViewProjection, modelViewProjectionTransform);
 
@@ -855,7 +855,7 @@ std::pair<std::string, bool> RenderableFov::determineTarget(double time) {
 
     // If none of the targets is in field of view, either use the last target or if there
     // hasn't been one, find the closest target
-    if (_previousTarget.empty()) {
+    if (_previousTarget.empty() && !_instrument.potentialTargets.empty()) {
         // If we reached this, we haven't found a target in field of view and we don't
         // have a previously selected target, so the next best heuristic for a target is
         // the closest one

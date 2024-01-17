@@ -2,7 +2,7 @@ local earth_transforms = asset.require("scene/solarsystem/planets/earth/transfor
 local psp_transforms = asset.require("scene/psp/transforms")
 
 
-asset.require("spice/base")
+asset.require("spice/core")
 
 local GSMKernel = asset.localResource("./kernels/GSM.ti")
 local GSEKernel = asset.localResource("./kernels/GSE.ti")

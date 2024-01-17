@@ -430,8 +430,6 @@ RenderableModel::RenderableModel(const ghoul::Dictionary& dictionary)
             case Parameters::AnimationMode::Once:
                 _animationMode = AnimationMode::Once;
                 break;
-            default:
-                throw ghoul::MissingCaseException();
         }
     }
 
@@ -528,7 +526,7 @@ RenderableModel::RenderableModel(const ghoul::Dictionary& dictionary)
 
     if (p.blendingOption.has_value()) {
         const std::string blendingOpt = *p.blendingOption;
-        _blendingFuncOption.set(BlendingMapping[blendingOpt]);
+        _blendingFuncOption = BlendingMapping[blendingOpt];
     }
 
     _originalRenderBin = renderBin();
@@ -790,14 +788,10 @@ void RenderableModel::render(const RenderData& data, RendererTasks&) {
     _program->activate();
 
     // Model transform and view transform needs to be in double precision
-    const glm::dmat4 modelTransform =
-        glm::translate(glm::dmat4(1.0), glm::dvec3(_pivot.value())) *
-        glm::translate(glm::dmat4(1.0), data.modelTransform.translation) *
-        glm::dmat4(data.modelTransform.rotation) *
-        glm::scale(glm::dmat4(1.0), glm::dvec3(data.modelTransform.scale)) *
-        glm::scale(_modelTransform.value(), glm::dvec3(_modelScale));
-    const glm::dmat4 modelViewTransform = data.camera.combinedViewMatrix() *
-        modelTransform;
+    glm::dmat4 modelTransform = calcModelTransform(data);
+    modelTransform = glm::translate(modelTransform, glm::dvec3(_pivot.value()));
+    modelTransform *= glm::scale(_modelTransform.value(), glm::dvec3(_modelScale));
+    const glm::dmat4 modelViewTransform = calcModelViewTransform(data, modelTransform);
 
     int nLightSources = 0;
     _lightIntensitiesBuffer.resize(_lightSources.size());
@@ -1052,7 +1046,7 @@ void RenderableModel::update(const UpdateData& data) {
 
 
     if (_geometry->hasAnimation() && !_animationStart.empty()) {
-        double relativeTime;
+        double relativeTime = 0.0;
         double now = data.time.j2000Seconds();
         double startTime = data.time.convertTime(_animationStart);
         double duration = _geometry->animationDuration();
@@ -1113,8 +1107,6 @@ void RenderableModel::update(const UpdateData& data) {
                     relativeTime = duration;
                 }
                 break;
-            default:
-                throw ghoul::MissingCaseException();
         }
         _geometry->update(relativeTime);
     }

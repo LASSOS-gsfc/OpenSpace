@@ -44,10 +44,13 @@ set(HEADER_FILES
   rendering/grids/renderablegrid.h
   rendering/grids/renderableradialgrid.h
   rendering/grids/renderablesphericalgrid.h
+  rendering/pointcloud/renderablepointcloud.h
+  rendering/pointcloud/renderablepolygoncloud.h
   rendering/renderablecartesianaxes.h
   rendering/renderabledisc.h
   rendering/renderablelabel.h
   rendering/renderablemodel.h
+  rendering/renderablenodearrow.h
   rendering/renderablenodeline.h
   rendering/renderableplane.h
   rendering/renderableplaneimagelocal.h
@@ -102,10 +105,13 @@ set(SOURCE_FILES
   rendering/grids/renderablegrid.cpp
   rendering/grids/renderableradialgrid.cpp
   rendering/grids/renderablesphericalgrid.cpp
+  rendering/pointcloud/renderablepointcloud.cpp
+  rendering/pointcloud/renderablepolygoncloud.cpp
   rendering/renderablecartesianaxes.cpp
   rendering/renderabledisc.cpp
   rendering/renderablelabel.cpp
   rendering/renderablemodel.cpp
+  rendering/renderablenodearrow.cpp
   rendering/renderablenodeline.cpp
   rendering/renderableplane.cpp
   rendering/renderableplaneimagelocal.cpp
@@ -142,8 +148,13 @@ set(SOURCE_FILES
 source_group("Source Files" FILES ${SOURCE_FILES})
 
 set(SHADER_FILES
+  shaders/arrow_fs.glsl
+  shaders/arrow_vs.glsl
   shaders/axes_fs.glsl
   shaders/axes_vs.glsl
+  shaders/billboardpoint_fs.glsl
+  shaders/billboardpoint_gs.glsl
+  shaders/billboardpoint_vs.glsl
   shaders/disc_fs.glsl
   shaders/disc_vs.glsl
   shaders/grid_vs.glsl
@@ -156,6 +167,9 @@ set(SHADER_FILES
   shaders/model_vs.glsl
   shaders/plane_fs.glsl
   shaders/plane_vs.glsl
+  shaders/polygon_fs.glsl
+  shaders/polygon_gs.glsl
+  shaders/polygon_vs.glsl
   shaders/prism_fs.glsl
   shaders/prism_vs.glsl
   shaders/renderabletrail_fs.glsl

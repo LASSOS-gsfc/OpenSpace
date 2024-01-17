@@ -262,7 +262,8 @@ void ScriptScheduler::setCurrentTime(double time) {
         for (const std::string& script : scheduledScripts) {
             global::scriptEngine->queueScript(
                 script,
-                scripting::ScriptEngine::RemoteScripting::Yes
+                scripting::ScriptEngine::ShouldBeSynchronized::Yes,
+                scripting::ScriptEngine::ShouldSendToRemote::Yes
             );
         }
     }
@@ -301,7 +302,8 @@ LuaLibrary ScriptScheduler::luaLibrary() {
             codegen::lua::SetModeApplicationTime,
             codegen::lua::SetModeRecordedTime,
             codegen::lua::SetModeSimulationTime,
-            codegen::lua::Clear
+            codegen::lua::Clear,
+            codegen::lua::ScheduledScripts
         }
     };
 }

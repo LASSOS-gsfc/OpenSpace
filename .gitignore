@@ -43,6 +43,7 @@ COMMIT.md
 /modules/skybrowser/wwtimagedata
 doc
 config/schema/sgct.schema.json
+settings.json
 
 # local assets
 /out/

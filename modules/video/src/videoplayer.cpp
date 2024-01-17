@@ -266,15 +266,12 @@ VideoPlayer::VideoPlayer(const ghoul::Dictionary& dictionary)
 
     if (p.playbackMode.has_value()) {
         switch (*p.playbackMode) {
-        case Parameters::PlaybackMode::RealTimeLoop:
-            _playbackMode = PlaybackMode::RealTimeLoop;
-            break;
-        case Parameters::PlaybackMode::MapToSimulationTime:
-            _playbackMode = PlaybackMode::MapToSimulationTime;
-            break;
-        default:
-            LERROR("Missing playback mode in VideoTileProvider");
-            throw ghoul::MissingCaseException();
+            case Parameters::PlaybackMode::RealTimeLoop:
+                _playbackMode = PlaybackMode::RealTimeLoop;
+                break;
+            case Parameters::PlaybackMode::MapToSimulationTime:
+                _playbackMode = PlaybackMode::MapToSimulationTime;
+                break;
         }
     }
 
@@ -564,7 +561,8 @@ void VideoPlayer::handleMpvEvents() {
         }
         if (!checkMpvError(event->error)) {
             LWARNING(fmt::format(
-                "Error at mpv event : {} {}", event->event_id, event->reply_userdata
+                "Error at mpv event: {} {}",
+                static_cast<int>(event->event_id), event->reply_userdata
             ));
             break;
         }

@@ -156,7 +156,7 @@ namespace {
 
         // [[codegen::verbatim(LabelsInfo.description)]]
         std::optional<ghoul::Dictionary> labels
-            [[codegen::reference("space_labelscomponent")]];
+            [[codegen::reference("labelscomponent")]];
 
         // [[codegen::verbatim(TransformationMatrixInfo.description)]]
         std::optional<glm::dmat4x4> transformationMatrix;
@@ -238,7 +238,7 @@ RenderablePlanesCloud::RenderablePlanesCloud(const ghoul::Dictionary& dictionary
     _renderOption.addOption(1, "Camera Position Normal");
     _renderOption.addOption(2, "Screen center Position Normal");
     addProperty(_renderOption);
-    //_renderOption.set(1);
+    //_renderOption = 1;
 
     if (p.unit.has_value()) {
         _unit = codegen::map<DistanceUnit>(*p.unit);
@@ -266,15 +266,14 @@ RenderablePlanesCloud::RenderablePlanesCloud(const ghoul::Dictionary& dictionary
         { BlendModeAdditive, "Additive" }
     });
     _blendMode.onChange([this]() {
-        switch (_blendMode) {
+        BlendMode m = static_cast<BlendMode>(_blendMode.value());
+        switch (m) {
             case BlendModeNormal:
                 setRenderBin(Renderable::RenderBin::Opaque);
                 break;
             case BlendModeAdditive:
                 setRenderBin(Renderable::RenderBin::PreDeferredTransparent);
                 break;
-            default:
-                throw ghoul::MissingCaseException();
         }
     });
 
@@ -323,7 +322,7 @@ void RenderablePlanesCloud::initialize() {
     ZoneScoped;
 
     if (_hasSpeckFile && std::filesystem::is_regular_file(_speckFile)) {
-        _dataset = speck::data::loadFileWithCache(_speckFile);
+        _dataset = dataloader::data::loadFileWithCache(_speckFile);
         if (_dataset.entries.empty()) {
             throw ghoul::RuntimeError("Error loading data");
         }
@@ -376,8 +375,8 @@ void RenderablePlanesCloud::deinitializeGL() {
 }
 
 void RenderablePlanesCloud::renderPlanes(const RenderData&,
-                                         const glm::dmat4& modelViewMatrix,
-                                         const glm::dmat4& projectionMatrix,
+                                         const glm::dmat4& modelViewTransform,
+                                         const glm::dmat4& projectionTransform,
                                          const float fadeInVariable)
 {
     glEnablei(GL_BLEND, 0);
@@ -387,10 +386,11 @@ void RenderablePlanesCloud::renderPlanes(const RenderData&,
 
     _program->activate();
 
-    glm::dmat4 modelViewProjectionMatrix = glm::dmat4(projectionMatrix) * modelViewMatrix;
+    glm::dmat4 modelViewProjectionTransform =
+        glm::dmat4(projectionTransform) * modelViewTransform;
     _program->setUniform(
         _uniformCache.modelViewProjectionTransform,
-        modelViewProjectionMatrix
+        modelViewProjectionTransform
     );
     _program->setUniform(_uniformCache.alphaValue, opacity());
     _program->setUniform(_uniformCache.fadeInValue, fadeInVariable);
@@ -448,24 +448,21 @@ void RenderablePlanesCloud::render(const RenderData& data, RendererTasks&) {
         }
     }
 
-    const glm::dmat4 modelMatrix =
-        glm::translate(glm::dmat4(1.0), data.modelTransform.translation) * // Translation
-        glm::dmat4(data.modelTransform.rotation) *  // Spice rotation
-        glm::scale(glm::dmat4(1.0), glm::dvec3(data.modelTransform.scale));
-
-    const glm::dmat4 modelViewMatrix = data.camera.combinedViewMatrix() * modelMatrix;
-    const glm::mat4 projectionMatrix = data.camera.projectionMatrix();
+    const glm::dmat4 modelTransform = calcModelTransform(data);
+    const glm::dmat4 modelViewTransform = calcModelViewTransform(data, modelTransform);
+    const glm::mat4 projectionTransform = data.camera.projectionMatrix();
 
     if (_hasSpeckFile) {
-        renderPlanes(data, modelViewMatrix, projectionMatrix, fadeInVariable);
+        renderPlanes(data, modelViewTransform, projectionTransform, fadeInVariable);
     }
 
     if (_hasLabels) {
-        const glm::dmat4 mvpMatrix = glm::dmat4(projectionMatrix) * modelViewMatrix;
+        const glm::dmat4 modelViewProjectionTransform =
+            glm::dmat4(projectionTransform) * modelViewTransform;
 
-        const glm::dmat4 invMVPParts = glm::inverse(modelMatrix) *
+        const glm::dmat4 invMVPParts = glm::inverse(modelTransform) *
             glm::inverse(data.camera.combinedViewMatrix()) *
-            glm::inverse(glm::dmat4(projectionMatrix));
+            glm::inverse(glm::dmat4(projectionTransform));
         const glm::dvec3 orthoRight = glm::normalize(
             glm::dvec3(invMVPParts * glm::dvec4(1.0, 0.0, 0.0, 0.0))
         );
@@ -473,7 +470,7 @@ void RenderablePlanesCloud::render(const RenderData& data, RendererTasks&) {
             glm::dvec3(invMVPParts * glm::dvec4(0.0, 1.0, 0.0, 0.0))
         );
 
-        _labels->render(data, mvpMatrix, orthoRight, orthoUp, fadeInVariable);
+        _labels->render(data, modelViewProjectionTransform, orthoRight, orthoUp, fadeInVariable);
     }
 }
 
@@ -491,7 +488,7 @@ void RenderablePlanesCloud::update(const UpdateData&) {
 }
 
 void RenderablePlanesCloud::loadTextures() {
-    for (const speck::Dataset::Texture& tex : _dataset.textures) {
+    for (const dataloader::Dataset::Texture& tex : _dataset.textures) {
         std::filesystem::path fullPath = absPath(_texturesPath.string() + '/' + tex.file);
         std::filesystem::path pngPath = fullPath;
         pngPath.replace_extension(".png");
@@ -538,7 +535,7 @@ void RenderablePlanesCloud::createPlanes() {
         LDEBUG("Creating planes...");
         float maxSize = 0.f;
         double maxRadius = 0.0;
-        for (const speck::Dataset::Entry& e : _dataset.entries) {
+        for (const dataloader::Dataset::Entry& e : _dataset.entries) {
             const glm::vec4 transformedPos = glm::vec4(
                 _transformationMatrix * glm::dvec4(e.position, 1.0)
             );
